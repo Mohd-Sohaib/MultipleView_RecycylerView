@@ -4,31 +4,42 @@ import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import kotlinx.android.synthetic.main.item_view.view.*
+import com.mohdsohaib.viewbindingrecyclerview.databinding.ItemView1Binding
+import com.mohdsohaib.viewbindingrecyclerview.databinding.ItemView2Binding
+import kotlinx.android.synthetic.main.item_view_1.view.*
 
-class MyAdapter(val contacts: List<contact>) : Adapter<MyAdapter.MyViewHolder>() {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
-        val view = inflater.inflate(R.layout.item_view, parent,false)
-        return MyViewHolder(view)
+class MyAdapter(val contacts: List<contact_data>) : Adapter<ViewHolder>() {
+
+    companion object{
+        const val FIRST_VIEW = 1
+        const val SECOND_VIEW = 2
     }
-    override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        holder.itemView.contact_name.text = contacts[position].name
-        holder.itemView.contact_number.text = contacts[position].number.toString()
-        var color = "#808080"
-        if(position%2==0){
-            color = "#C0C0C0"
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+         return when(viewType){
+             FIRST_VIEW -> RecyclerViewHolderONE(ItemView1Binding.inflate(LayoutInflater.from(parent.context),parent,false))
+             SECOND_VIEW -> RecyclerViewHolderSECOND(ItemView2Binding.inflate(LayoutInflater.from(parent.context),parent,false))
+             else -> throw IllegalArgumentException("Invalid Item Type")
+         }
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        return when(contacts[position].theItemView){
+            FIRST_VIEW -> (holder as RecyclerViewHolderONE).bind(contacts[position])
+            SECOND_VIEW -> (holder as RecyclerViewHolderSECOND).bind(contacts[position])
+            else -> throw IllegalStateException("Invalid Item Type")
         }
-        holder.itemView.container.setBackgroundColor(Color.parseColor(color))
     }
 
     override fun getItemCount(): Int {
         return contacts.size
     }
 
-    class MyViewHolder(itemView: View) : ViewHolder(itemView) {
+    override fun getItemViewType(position: Int): Int {
+         return contacts[position].theItemView
     }
+
 }
 
